@@ -11,18 +11,18 @@ node{
      
      stage ('Test'){
          def mvnHome =  tool name: 'myMaven', type: 'maven'    
-         sh "${mvnHome}/bin/mvn verify; sleep 3"
+         bat "${mvnHome}/bin/mvn verify; sleep 3"
       }
       
      stage('Build Docker Image'){         
-           sh "docker build -t ${dockerImageName} ."
+           bat "docker build -t ${dockerImageName} ."
       }  
    
       stage('Publish Docker Image'){
          withCredentials([string(credentialsId: 'docker_cred', variable: 'dockerPWD')]) {
-              sh "docker login -u veerendraperugu -p ${dockerPWD}"
+              bat "docker login -u veerendraperugu -p ${dockerPWD}"
          }
-        sh "docker push ${dockerImageName}"
+        bat "docker push ${dockerImageName}"
       }
       
     stage('Run Docker Image'){
@@ -31,11 +31,11 @@ node{
             def scriptRunner='sudo ./stopscript.sh'           
             def dockerRun= "sudo docker run -p 8082:8080 -d --name ${dockerContainerName} ${dockerImageName}" 
             withCredentials([string(credentialsId: 'deploymentserverpwd', variable: 'dpPWD')]) {
-                  sh "sshpass -p ${dpPWD} ssh -o StrictHostKeyChecking=no node1@192.168.160.128" 
-                  sh "sshpass -p ${dpPWD} scp -r stopscript.sh node1@192.168.160.129:/home/node1" 
-                  sh "sshpass -p ${dpPWD} ssh -o StrictHostKeyChecking=no node1@192.168.160.128 ${changingPermission}"
-                  sh "sshpass -p ${dpPWD} ssh -o StrictHostKeyChecking=no node1@192.168.160.128 ${scriptRunner}"
-                  sh "sshpass -p ${dpPWD} ssh -o StrictHostKeyChecking=no node1@192.168.160.128 ${dockerRun}"
+                  bat "sshpass -p ${dpPWD} ssh -o StrictHostKeyChecking=no node1@192.168.160.128" 
+                  bat "sshpass -p ${dpPWD} scp -r stopscript.sh node1@192.168.160.129:/home/node1" 
+                  bat "sshpass -p ${dpPWD} ssh -o StrictHostKeyChecking=no node1@192.168.160.128 ${changingPermission}"
+                  bat "sshpass -p ${dpPWD} ssh -o StrictHostKeyChecking=no node1@192.168.160.128 ${scriptRunner}"
+                  bat "sshpass -p ${dpPWD} ssh -o StrictHostKeyChecking=no node1@192.168.160.128 ${dockerRun}"
             }
             
       
