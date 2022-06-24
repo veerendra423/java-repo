@@ -6,7 +6,7 @@ node{
       stage('Build'){
          // Get maven home path and build
          def mvnHome =  tool name: 'myMaven', type: 'maven'   
-         sh "${mvnHome}/bin/mvn package -Dmaven.test.skip=true"
+         bat "${mvnHome}/bin/mvn package -Dmaven.test.skip=true"
       }       
      
      stage ('Test'){
